@@ -9,7 +9,7 @@ export class PostController {
 
     @Post()
     createPost(@Body(new ValidationPipe()) createPostDTO: CreatePostDTO){
-        return this.postService.createPost(CreatePostDTO)
+        return this.postService.createPost(createPostDTO)
     }
 
 }

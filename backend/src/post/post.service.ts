@@ -22,7 +22,6 @@ export class PostService {
 
         });
 
-
         this.logger.log(`Created post: ${post.id}`);
         return post;
     }
