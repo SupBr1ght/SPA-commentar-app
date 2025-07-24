@@ -1,0 +1,35 @@
+{
+  "name": "spa-commentar-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SupBr1ght/SPA-commentar-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SupBr1ght/SPA-commentar-app/issues"
+  },
+  "homepage": "https://github.com/SupBr1ght/SPA-commentar-app#readme",
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^24.1.0",
+    "nodemon": "^3.1.10",
+    "prisma": "^6.12.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.1.5",
+    "@nestjs/testing": "^11.1.5",
+    "@prisma/client": "^6.12.0",
+    "class-validator": "^0.14.2"
+  }
+}
