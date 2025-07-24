@@ -1,1 +1,0 @@
-# SPA-commentar-app

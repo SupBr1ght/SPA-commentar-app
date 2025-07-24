@@ -1,26 +1,29 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { PrismaService } from 'prisma/prisma/prisma.service';
-import { CreateCommentDTO } from 'src/dto/createCommentDTO';
+import { PrismaService } from '../../prisma/prisma.service';
+import { CreateCommentDTO } from '../dto/createCommentDTO';
+
 @Injectable()
 export class CommentService {
     private readonly logger = new Logger(CommentService.name);
 
-    constructor(readonly prismaServise: PrismaService) { }
+    constructor(readonly prismaServiсe: PrismaService) { }
 
     async createComment(createCommentDTO: CreateCommentDTO) {
 
-        const { userName, email, homepage, text, postId } = createCommentDTO
+        const { authorId, postId, text } = createCommentDTO;
 
-        const comment = await this.prismaServise.comment.create({
+        const comment = await this.prismaServiсe.comment.create({
             data: {
-                userName,
-                email,
-                homepage,
                 text,
-                postId,
-                // authorId: user.id,
+                post: {
+                    connect: { id: postId },
+                },
+                author: {
+                    connect: { id: authorId },
+                },
             },
         });
+
 
         this.logger.log(`Created comment: ${comment.id}`);
         return comment;

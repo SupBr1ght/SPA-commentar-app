@@ -18,5 +18,6 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
     "types": ["jest", "node"]
-  }
+  },
+  "include":  ["src/**/*", "prisma/**/*"]
 }
