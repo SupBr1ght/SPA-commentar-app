@@ -5,12 +5,17 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { extname } from 'path';
 import { FileService } from '../file-service/file-service.service';
 import * as multer from 'multer';
+import { CommentsGateway } from './comment.gateway';
 const upload = multer({ storage: multer.memoryStorage() });
 
 @Controller('comments')
 export class CommentController {
 
-    constructor(private commentService: CommentService, private fileService: FileService) { }
+    constructor(
+        private commentService: CommentService,
+        private fileService: FileService,
+        private readonly commentsGateway: CommentsGateway
+    ) { }
 
     @Post()
     @UseInterceptors(FileInterceptor('file'))
@@ -52,7 +57,11 @@ export class CommentController {
             fileType,
         };
 
-        return this.commentService.createComment(commentData);
+        const createdComment = await this.commentService.createComment(commentData);
+        //implement websocket
+        this.commentsGateway.sendNewComment(createdComment);
+
+        return createdComment
     }
     @Get('/post/:postId/comments')
     async getCommentsForPost(
