@@ -48,7 +48,7 @@ export class CommentService {
 
     async createComment(createCommentDTO: CreateCommentDTO) {
 
-        const { authorId, postId, text, parentId } = createCommentDTO;
+        const { authorId, postId, text, parentId, fileType, fileUrl } = createCommentDTO;
         
         const cleanText = sanitizeHTML(text);
 
@@ -63,6 +63,8 @@ export class CommentService {
                     connect: { id: authorId },
                 },
                 parent: parentId ? { connect: { id: parentId } } : undefined,
+                fileUrl,
+                fileType
             },
         });
 

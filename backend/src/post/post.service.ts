@@ -1,7 +1,7 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { CreatePostDTO } from 'src/dto/createPostDTO';
-import { sanitizeHTML } from 'src/utils/sanitiseInput';
+import { CreatePostDTO } from '..//dto/createPostDTO';
+import { sanitizeHTML } from '../utils/sanitiseInput';
 
 @Injectable()
 export class PostService {

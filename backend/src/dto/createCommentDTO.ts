@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, Matches, IsUUID, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsString, Matches, IsUUID, IsOptional, IsIn } from 'class-validator';
 
 export class CreateCommentDTO {
     @IsNotEmpty()
@@ -19,4 +19,12 @@ export class CreateCommentDTO {
     @IsUUID()
     @IsOptional()
     parentId: string
+
+    @IsOptional()
+    @IsString()
+    fileUrl?: string;
+
+    @IsOptional()
+    @IsIn(['image', 'text'])
+    fileType?: 'image' | 'text';
 }

@@ -43,6 +43,8 @@ model Comment {
 
   parent    Comment? @relation("CommentReplies", fields: [parentId], references: [id])
   parentId String?
+  fileUrl   String?     
+  fileType  String?  
 
   replies Comment[] @relation("CommentReplies")
 }
