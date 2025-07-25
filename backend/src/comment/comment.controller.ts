@@ -4,6 +4,8 @@ import { CommentService } from './comment.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { extname } from 'path';
 import { FileService } from '../file-service/file-service.service';
+import * as multer from 'multer';
+const upload = multer({ storage: multer.memoryStorage() });
 
 @Controller('comments')
 export class CommentController {
@@ -16,20 +18,24 @@ export class CommentController {
         @Body(new ValidationPipe()) createCommentDTO: CreateCommentDTO,
         @UploadedFile() file?: Express.Multer.File,
     ) {
-        let fileUrl: string | undefined;
+        let fileUrl: string | undefined | string | undefined;
         let fileType: 'image' | 'text' | undefined;
 
         if (file) {
             const ext = extname(file.originalname).toLowerCase();
             const isImage = ['.jpg', '.jpeg', '.png', '.gif', '.webp'].includes(ext);
-            const isText = ['.txt', '.md'].includes(ext);
 
-            if (isImage) fileType = 'image';
-            else if (isText) fileType = 'text';
-            else throw new BadRequestException('Unsupported file type');
+            if (!isImage) {
+                throw new BadRequestException('Unsupported file type');
+            }
 
-            // Save file in file system
-            fileUrl = await this.fileService.upload(file);
+            const result = await this.fileService.processAndSaveImage(file);
+            fileUrl = result.url;
+            if (result.type === 'image' || result.type === 'text') {
+                fileType = result.type; 
+            } else {
+                throw new BadRequestException('Invalid file type returned from file service');
+            }
         }
 
         // conver to plain object for spread
