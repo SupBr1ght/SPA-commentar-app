@@ -10,11 +10,12 @@ import { ConfigModule } from '@nestjs/config';
 import { PostController } from './post/post.controller';
 import { PostService } from './post/post.service';
 import { PostModule } from './post/post.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [  ConfigModule.forRoot({
       isGlobal: true, // доступ до env у будь-якому модулі
-    }),CommentModule, PrismaModule, PostModule],
+    }),CommentModule, PrismaModule, PostModule, UserModule],
   controllers: [AppController, CommentController, PostController],
   providers: [AppService, CommentService, PrismaService, PostService],
 })

@@ -1,10 +1,8 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsUrl, Matches } from 'class-validator';
+import { IsAlphanumeric, IsEmail, IsNotEmpty, IsOptional, IsString, IsUrl, Matches } from 'class-validator';
 
 export class CreateUserDTO {
   @IsNotEmpty()
-  @Matches(/^[a-zA-Z0-9]+$/, {
-    message: 'Username must contain only letters and digits',
-  })
+  @Matches(/^[a-zA-Z0-9 ]+$/, { message: 'Name can only contain letters, digits, and spaces' })
   name: string;
 
   @IsEmail()

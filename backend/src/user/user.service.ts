@@ -5,7 +5,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 export class UserService {
     private readonly logger = new Logger(UserService.name);
 
-    constructor(readonly userService: UserService, readonly prismaService: PrismaService) { }
+    constructor(readonly prismaService: PrismaService) { }
 
     async createUser(createUserDTO: CreateUserDTO) {
 
