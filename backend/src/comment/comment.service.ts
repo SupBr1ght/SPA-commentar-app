@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateCommentDTO } from '../dto/createCommentDTO';
+import { sanitizeHTML } from '../utils/sanitiseInput';
 
 export type CommentNode = {
     id: string;
@@ -30,18 +31,17 @@ export class CommentService {
             map.set(comment.id, { ...comment, replies: [] });
         }
 
-        for (const comment of comments) {
-            // If this commentar is reply
+        //  return parent or parent with nested comments
+        map.forEach(comment => {
             if (comment.parentId) {
-                // find parent comment and add this child comment to it 
-                // this is nor null and neither undefined
-                const child = map.get(comment.id)!;
                 const parent = map.get(comment.parentId);
-                parent?.replies.push(child);
+                if (parent) {
+                    parent.replies!.push(comment);
+                }
             } else {
-                roots.push(map.get(comment.id)!);
+                roots.push(comment);
             }
-        }
+        });
 
         return roots;
     }
@@ -49,10 +49,13 @@ export class CommentService {
     async createComment(createCommentDTO: CreateCommentDTO) {
 
         const { authorId, postId, text, parentId } = createCommentDTO;
+        
+        const cleanText = sanitizeHTML(text);
+
 
         const comment = await this.prismaServiсe.comment.create({
             data: {
-                text,
+                text: cleanText,
                 post: {
                     connect: { id: postId },
                 },
@@ -77,11 +80,12 @@ export class CommentService {
     ) {
         const pageSize = 25;
         const skip = (page - 1) * pageSize;
-     
+
 
         const comments = await this.prismaServiсe.comment.findMany({
             where: {
                 postId,
+                parentId: null
             },
             orderBy:
                 sortBy === 'date'
@@ -95,17 +99,19 @@ export class CommentService {
             },
         });
 
-        const commentsWithReplies = comments.map(comment => ({
+        const allComments = await this.prismaServiсe.comment.findMany({
+            where: { postId },
+            include: { author: true },
+        });
+
+        const commentsWithReplies: CommentNode[] = allComments.map(comment => ({
             ...comment,
             replies: [],
         }));
-
-        // build tree
+        
         const tree = this.buildTree(commentsWithReplies);
-
-        const paginatedTree = tree.slice(skip, skip + pageSize);
-
-        return tree;
+        const topLevelWithReplies = tree.slice(skip, skip + pageSize);
+        return topLevelWithReplies;
     }
 
 }   
