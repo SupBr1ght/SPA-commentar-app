@@ -20,11 +20,4 @@ export class CreateCommentDTO {
     @IsOptional()
     parentId: string
 
-    @IsOptional()
-    @IsString()
-    fileUrl?: string;
-
-    @IsOptional()
-    @IsIn(['image', 'text'])
-    fileType?: 'image' | 'text';
 }

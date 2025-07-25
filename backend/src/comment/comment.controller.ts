@@ -15,7 +15,7 @@ export class CommentController {
     @Post()
     @UseInterceptors(FileInterceptor('file'))
     async createComment(
-        @Body(new ValidationPipe()) createCommentDTO: CreateCommentDTO,
+        @Body(new ValidationPipe()) body: CreateCommentDTO,
         @UploadedFile() file?: Express.Multer.File,
     ) {
         let fileUrl: string | undefined | string | undefined;
@@ -23,16 +23,20 @@ export class CommentController {
 
         if (file) {
             const ext = extname(file.originalname).toLowerCase();
-            const isImage = ['.jpg', '.jpeg', '.png', '.gif', '.webp'].includes(ext);
 
-            if (!isImage) {
+            const ALLOWED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+            const ALLOWED_TEXT_EXTENSIONS = ['.txt'];
+
+            const isImage = ALLOWED_IMAGE_EXTENSIONS.includes(ext);
+            const isText = ALLOWED_TEXT_EXTENSIONS.includes(ext);
+
+            if (!isImage && !isText) {
                 throw new BadRequestException('Unsupported file type');
             }
-
             const result = await this.fileService.processAndSaveImage(file);
             fileUrl = result.url;
             if (result.type === 'image' || result.type === 'text') {
-                fileType = result.type; 
+                fileType = result.type;
             } else {
                 throw new BadRequestException('Invalid file type returned from file service');
             }
@@ -40,10 +44,10 @@ export class CommentController {
 
         // conver to plain object for spread
         const commentData = {
-            text: createCommentDTO.text,
-            postId: createCommentDTO.postId,
-            authorId: createCommentDTO.authorId,
-            parentId: createCommentDTO.parentId,
+            text: body.text,
+            postId: body.postId,
+            authorId: body.authorId,
+            parentId: body.parentId,
             fileUrl,
             fileType,
         };
