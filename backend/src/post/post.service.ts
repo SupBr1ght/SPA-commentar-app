@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreatePostDTO } from 'src/dto/createPostDTO';
 
@@ -27,11 +27,20 @@ export class PostService {
     }
 
     async getPostWithAuthor(postId: string) {
-        return this.prismaServiсe.post.findUnique({
+        if (!postId) throw new NotFoundException('Post ID is missing');
+
+        const post = await this.prismaServiсe.post.findUnique({
             where: { id: postId },
             include: {
-                author: true, // includes post's author 
+                author: true,
+                comments: true
             },
         });
+
+        if (!post) {
+            throw new NotFoundException(`Post with id ${postId} not found`);
+        }
+
+        return post;
     }
 }

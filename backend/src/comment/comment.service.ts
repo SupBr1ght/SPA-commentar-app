@@ -48,7 +48,7 @@ export class CommentService {
 
     async createComment(createCommentDTO: CreateCommentDTO) {
 
-        const { authorId, postId, text } = createCommentDTO;
+        const { authorId, postId, text, parentId } = createCommentDTO;
 
         const comment = await this.prismaServiсe.comment.create({
             data: {
@@ -59,6 +59,7 @@ export class CommentService {
                 author: {
                     connect: { id: authorId },
                 },
+                parent: parentId ? { connect: { id: parentId } } : undefined,
             },
         });
 
@@ -75,8 +76,8 @@ export class CommentService {
         page: number
     ) {
         const pageSize = 25;
-        // how many we need to skip pages
         const skip = (page - 1) * pageSize;
+     
 
         const comments = await this.prismaServiсe.comment.findMany({
             where: {
@@ -88,7 +89,6 @@ export class CommentService {
                     : sortBy === 'name'
                         ? { author: { name: order } }
                         : { author: { email: order } },
-            skip,
             take: pageSize,
             include: {
                 author: true,
@@ -102,6 +102,8 @@ export class CommentService {
 
         // build tree
         const tree = this.buildTree(commentsWithReplies);
+
+        const paginatedTree = tree.slice(skip, skip + pageSize);
 
         return tree;
     }
