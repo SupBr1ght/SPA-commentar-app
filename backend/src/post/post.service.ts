@@ -25,4 +25,13 @@ export class PostService {
         this.logger.log(`Created post: ${post.id}`);
         return post;
     }
+
+    async getPostWithAuthor(postId: string) {
+        return this.prismaServiсe.post.findUnique({
+            where: { id: postId },
+            include: {
+                author: true, // includes post's author 
+            },
+        });
+    }
 }
