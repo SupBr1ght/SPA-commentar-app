@@ -1,6 +1,7 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreatePostDTO } from 'src/dto/createPostDTO';
+import { sanitizeHTML } from 'src/utils/sanitiseInput';
 
 @Injectable()
 export class PostService {
@@ -12,10 +13,13 @@ export class PostService {
 
         const { authorId, rating, title, body } = createPostDTO;
 
+        const cleanTitle = sanitizeHTML(title);
+        const cleanBody = sanitizeHTML(body);
+
         const post = await this.prismaServiсe.post.create({
             data: {
-                title,
-                body,
+                title: cleanTitle,
+                body: cleanBody,
                 authorId,
                 rating
             }
