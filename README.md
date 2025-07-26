@@ -3,18 +3,9 @@ Here's a well-structured and clear README for your SPA Commentar App, ready for 
 SPA Commentar App 🧩
 This project is a Single Page Application (SPA) for comments, built with Nest.js for the backend, React for the frontend, and PostgreSQL for the database. It's designed to be easily launched using Docker Compose.
 
-🔧 Project Structure
-The project has a clear and organized directory structure:
-
-SPA-commentar-app/
-│
-├── backend/       # Nest.js backend application
-├── frontend/      # React frontend application
-├── docker-compose.yml # Docker Compose configuration for services
-├── .env           # Environment variables for the entire project
 🚀 Quick Start
 To get the application up and running quickly, follow these steps.
-
+***
 ⚠️ You need to have Docker and Docker Compose installed on your system.
 
 1. Clone the Repository
