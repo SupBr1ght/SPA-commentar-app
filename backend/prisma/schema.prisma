@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      =  env("DATABASE_URL")
+}
+
+model Post {
+  id        String    @id @default(uuid())
+  rating    Float
+  title     String
+  body      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  author    User      @relation(fields: [authorId], references: [id])
+  authorId  String
+  comments Comment[]
+}
+
+model User {
+  id        String    @id @default(uuid())
+  name      String
+  email     String
+  homepage  String?
+
+  posts     Post[]
+  comments Comment[]
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  text      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  post   Post   @relation(fields: [postId], references: [id])
+  postId String
+
+  author   User   @relation(fields: [authorId], references: [id])
+  authorId String
+
+  parent    Comment? @relation("CommentReplies", fields: [parentId], references: [id])
+  parentId String?
+  fileUrl   String?     
+  fileType  String?  
+
+  replies Comment[] @relation("CommentReplies")
+}

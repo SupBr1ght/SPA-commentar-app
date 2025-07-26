@@ -1,0 +1,57 @@
+{
+  "name": "spa-commentar-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./src/main.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "ts-node src/main.ts",
+    "start:dev": "nodemon --exec ts-node src/main.ts",
+    "start:debug": "nodemon --exec ts-node --inspect src/main.js",
+    "dev:prisma": "npx prisma generate && npx prisma studio",
+    "build": "tsc -p tsconfig.build.json",
+    "start:prod": "node dist/src/main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SupBr1ght/SPA-commentar-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SupBr1ght/SPA-commentar-app/issues"
+  },
+  "homepage": "https://github.com/SupBr1ght/SPA-commentar-app#readme",
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/jest": "^30.0.0",
+    "@types/jsdom": "^21.1.7",
+    "@types/mocha": "^10.0.10",
+    "@types/multer": "^2.0.0",
+    "@types/node": "^24.1.0",
+    "nodemon": "^3.1.10",
+    "prisma": "^6.12.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.1.5",
+    "@nestjs/config": "^4.0.2",
+    "@nestjs/platform-express": "^11.1.5",
+    "@nestjs/platform-socket.io": "^11.1.5",
+    "@nestjs/testing": "^11.1.5",
+    "@nestjs/websockets": "^11.1.5",
+    "@prisma/client": "^6.12.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
+    "dompurify": "^3.2.6",
+    "jsdom": "^26.1.0",
+    "sanitize-html": "^2.17.0",
+    "sharp": "^0.34.3",
+    "socket.io": "^4.8.1"
+  },
+  "prisma": {
+    "schema": "prisma/schema.prisma"
+  }
+}
