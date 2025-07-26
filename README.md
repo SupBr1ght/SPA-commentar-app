@@ -11,16 +11,16 @@ First, clone the project repository to your local machine:
 
 Bash
 
-git clone <repo-url> # Replace <repo-url> with your repository's URL
-cd SPA-commentar-app
+- git clone <repo-url> # Replace <repo-url> with your repository's URL
+- cd SPA-commentar-app
 2. Create Environment Variables
 Create a .env file in the root of the project (next to docker-compose.yml) and add the following environment variables. Remember to replace yourpassword with a strong password.
 
 Code snippet
 
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=yourpassword # Change this to a secure password
-POSTGRES_DB=commentsdb
+- POSTGRES_USER=postgres
+- POSTGRES_PASSWORD=yourpassword # Change this to a secure password
+- POSTGRES_DB=commentsdb
 3. Launch Containers
 Once the .env file is set up, you can start all services using Docker Compose:
 
