@@ -1,39 +1,57 @@
 import React, { useState } from 'react';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 export default function App() {
-  // State for form fields
+  // Стани форми
   const [text, setText] = useState('');
   const [postId, setPostId] = useState('');
   const [authorId, setAuthorId] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [showPreview, setShowPreview] = useState(false);
+  
+  // Стейт для зберігання капча токена
+  const [captchaValue, setCaptchaValue] = useState<string | null>(null);
 
-  // Insert BBCode tag into the text
+  // Вставка BBCode тега
   const insertTag = (tag: string) => {
     const defaultContent = tag === 'a' ? 'link text' : '';
     const tagMarkup = `[${tag}]${defaultContent}[/${tag}]`;
     setText(prev => prev + tagMarkup);
   };
 
-  // Handle form submission (send comment to backend)
+  // Хендлер зміни капчі
+  const onCaptchaChange = (value: string | null) => {
+    console.log("Captcha value:", value);
+    setCaptchaValue(value);
+  };
+
+  // Відправка форми
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate required fields
+    // Валідація обов’язкових полів
     if (!postId || !authorId || !text) {
       alert('Please fill all required fields');
       return;
     }
 
-    // Prepare form data
+    // Валідація капчі
+    if (!captchaValue) {
+      alert('Please complete the CAPTCHA');
+      return;
+    }
+
+    // Формуємо FormData для відправки
     const formData = new FormData();
     formData.append('text', text);
     formData.append('postId', postId);
     formData.append('authorId', authorId);
     if (file) formData.append('file', file);
 
+    // Важливо: додаємо токен капчі, щоб бекенд міг верифікувати
+    formData.append('captchaToken', captchaValue);
+
     try {
-      // Send POST request to the backend
       const res = await fetch('http://localhost:3000/comments', {
         method: 'POST',
         body: formData,
@@ -42,15 +60,19 @@ export default function App() {
       if (!res.ok) throw new Error('Failed to submit comment');
       alert('Comment submitted!');
 
-      // Reset form
+      // Скидаємо стани після успішної відправки
       setText('');
       setFile(null);
+      setCaptchaValue(null);
+      // Якщо треба, ресетимо капчу
+      if (captchaRef.current) captchaRef.current.reset();
+
     } catch (error) {
       alert(String(error));
     }
   };
 
-  // Convert BBCode to HTML for preview
+  // BBCode to HTML
   const renderTextWithTags = (input: string) => {
     return input
       .replace(/\[strong\](.*?)\[\/strong\]/g, '<strong>$1</strong>')
@@ -59,12 +81,14 @@ export default function App() {
       .replace(/\[a\](.*?)\[\/a\]/g, '<a href="#">$1</a>');
   };
 
+  // Реф для рекапчі, щоб можна було ресетнути
+  const captchaRef = React.useRef<ReCAPTCHA>(null);
+
   return (
     <div style={{ maxWidth: 600, margin: 'auto' }}>
       <h1>Create Comment</h1>
 
       <form onSubmit={handleSubmit}>
-        {/* Post ID input */}
         <div>
           <label>Post ID:</label>
           <input
@@ -75,7 +99,6 @@ export default function App() {
           />
         </div>
 
-        {/* Author ID input */}
         <div>
           <label>Author ID:</label>
           <input
@@ -86,7 +109,6 @@ export default function App() {
           />
         </div>
 
-        {/* Textarea for comment */}
         <div>
           <label>Text:</label>
           <textarea
@@ -97,7 +119,6 @@ export default function App() {
           />
         </div>
 
-        {/* Buttons to insert BBCode tags */}
         <div>
           <button type="button" onClick={() => insertTag('i')}>[i]</button>
           <button type="button" onClick={() => insertTag('strong')}>[strong]</button>
@@ -105,7 +126,6 @@ export default function App() {
           <button type="button" onClick={() => insertTag('a')}>[a]</button>
         </div>
 
-        {/* File input */}
         <div>
           <label>File:</label>
           <input
@@ -114,7 +134,15 @@ export default function App() {
           />
         </div>
 
-        {/* Submit and preview buttons */}
+        {/* Тут вставляємо reCAPTCHA */}
+        <div style={{ margin: '20px 0' }}>
+          <ReCAPTCHA
+            sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY!} // Передбачає, що ключ лежить в .env
+            onChange={onCaptchaChange}
+            ref={captchaRef}
+          />
+        </div>
+
         <div style={{ marginTop: 10 }}>
           <button type="submit">Submit</button>
           <button
@@ -127,7 +155,6 @@ export default function App() {
         </div>
       </form>
 
-      {/* Preview block */}
       {showPreview && (
         <div
           style={{
