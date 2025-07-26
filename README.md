@@ -1,5 +1,3 @@
-Here's a well-structured and clear README for your SPA Commentar App, ready for a GitHub repository:
-
 SPA Commentar App 🧩
 This project is a Single Page Application (SPA) for comments, built with Nest.js for the backend, React for the frontend, and PostgreSQL for the database. It's designed to be easily launched using Docker Compose.
 
