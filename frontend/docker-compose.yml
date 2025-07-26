@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./server
+    container_name: nest-backend
+    restart: always
+    ports:
+      - '5000:3000' # local:inbound (Nest by default on 3000)
+    environment:
+      - NODE_ENV=production
+
+  frontend:
+    build:
+      context: ./client
+    container_name: react-frontend
+    restart: always
+    ports:
+      - '80:80'  # nginx
+    depends_on:
+      - backend
