@@ -3,7 +3,7 @@ version: '3.8'
 services:
   backend:
     build:
-      context: ./server
+      context: ./backend
     container_name: nest-backend
     restart: always
     ports:
@@ -13,7 +13,7 @@ services:
 
   frontend:
     build:
-      context: ./client
+      context: ./frontend
     container_name: react-frontend
     restart: always
     ports:
