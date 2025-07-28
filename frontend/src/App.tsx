@@ -137,7 +137,7 @@ export default function App() {
         {/* Тут вставляємо reCAPTCHA */}
         <div style={{ margin: '20px 0' }}>
           <ReCAPTCHA
-            sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY!} // Передбачає, що ключ лежить в .env
+            sitekey={import.meta.env.VITE_CAPTCHA_SITE_KEY} // Передбачає, що ключ лежить в .env
             onChange={onCaptchaChange}
             ref={captchaRef}
           />

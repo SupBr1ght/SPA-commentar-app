@@ -30,6 +30,8 @@ services:
   frontend:
     build:
       context: ./frontend
+      args:
+        VITE_CAPTCHA_SITE_KEY: ${VITE_CAPTCHA_SITE_KEY}
       dockerfile: Dockerfile
     container_name: react-frontend
     restart: always

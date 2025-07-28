@@ -3,7 +3,7 @@ import axios from 'axios';
 
 @Injectable()
 export class CaptchaService {
-  private readonly secretKey = process.env.RECAPTCHA_SECRET_KEY; // тримай в .env
+  private readonly secretKey = process.env.CAPTCHA_ENV; 
 
   async validateCaptcha(token: string): Promise<boolean> {
     const url = `https://www.google.com/recaptcha/api/siteverify?secret=${this.secretKey}&response=${token}`;

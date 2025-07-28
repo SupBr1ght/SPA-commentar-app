@@ -1,6 +1,9 @@
 # client/Dockerfile
 FROM node:20-alpine AS build
 
+ARG VITE_CAPTCHA_SITE_KEY
+ENV VITE_CAPTCHA_SITE_KEY=$VITE_CAPTCHA_SITE_KEY
+
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
