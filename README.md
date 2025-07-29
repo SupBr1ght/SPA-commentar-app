@@ -32,7 +32,7 @@ This command will build the images (if they don't exist) and start the backend, 
 4. Verify the Application
 After the containers are up, you can access the application:
 
-Frontend: Open your browser and go to http://34.227.207.83
+Frontend: Open your browser and go to http://localhost:80
 
 Backend API: Access the backend at http://localhost:5000
 
