@@ -1,10 +1,14 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { join } from 'path';
+import * as express from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
+  
   // parse cors
   const corsOriginsEnv = process.env.CORS_ORIGINS || '';
   const corsOrigins = corsOriginsEnv.split(',').map(origin => origin.trim());
