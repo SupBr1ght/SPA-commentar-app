@@ -16,25 +16,33 @@ export class FileService {
   ): Promise<{ url: string; type: 'image' | 'text' }> {
     const ext = path.extname(file.originalname).toLowerCase();
     const mimetype = file.mimetype;
-    const outputFilename = `${Date.now()}-${file.originalname}`;
-    const outputPath = path.join(__dirname, '..', '..', 'uploads', outputFilename);
+    const uploadsDir = path.join(__dirname, 'uploads');
+
+    // create directory id it doesn't exist
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
 
     console.log('file.mimetype:', file.mimetype);
     console.log('file.originalname:', file.originalname);
 
-    // text
+    const outputFilename = `${Date.now()}-${file.originalname}`;
+    const outputPath = path.join(uploadsDir, outputFilename);
+
     if (ALLOWED_TEXT_EXTENSIONS.includes(ext)) {
       if (file.size > MAX_TEXT_FILE_SIZE) {
         throw new Error('Text file is too large');
       }
 
       fs.writeFileSync(outputPath, file.buffer);
+      console.log('Saving file to:', outputPath);
 
       return {
         url: `/uploads/${outputFilename}`,
         type: 'text',
       };
     }
+
 
     // Image
     if (ALLOWED_IMAGE_MIME_TYPES.includes(mimetype)) {

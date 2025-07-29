@@ -1,74 +1,151 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
+import type { CommentNode } from './pages/CommentTree';
 
 export default function App() {
-  // Стани форми
   const [text, setText] = useState('');
   const [postId, setPostId] = useState('');
   const [authorId, setAuthorId] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [showPreview, setShowPreview] = useState(false);
-  
-  // Стейт для зберігання капча токена
-  const [captchaValue, setCaptchaValue] = useState<string | null>(null);
+  const [comments, setComments] = useState<CommentNode[]>([]);
 
-  // Вставка BBCode тега
+
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState('');
+
+  const [captchaValue, setCaptchaValue] = useState<string | null>(null);
+  const captchaRef = useRef<ReCAPTCHA>(null);
+
+  // Upload commntars
+  useEffect(() => {
+    if (!postId) {
+      setComments([]);
+      return;
+    }
+    const fetchComments = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/comments/post/${postId}/comments`);
+        if (!res.ok) throw new Error('Failed to fetch comments');
+        const data = await res.json();
+        setComments(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchComments();
+  }, [postId]);
+
   const insertTag = (tag: string) => {
     const defaultContent = tag === 'a' ? 'link text' : '';
     const tagMarkup = `[${tag}]${defaultContent}[/${tag}]`;
     setText(prev => prev + tagMarkup);
   };
 
-  // Хендлер зміни капчі
   const onCaptchaChange = (value: string | null) => {
     console.log("Captcha value:", value);
     setCaptchaValue(value);
   };
 
-  // Відправка форми
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Сабміт основного коментаря
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Валідація обов’язкових полів
-    if (!postId || !authorId || !text) {
+    if (!postId.trim() || !authorId.trim() || !text.trim()) {
       alert('Please fill all required fields');
       return;
     }
 
-    // Валідація капчі
     if (!captchaValue) {
       alert('Please complete the CAPTCHA');
       return;
     }
 
-    // Формуємо FormData для відправки
-    const formData = new FormData();
-    formData.append('text', text);
-    formData.append('postId', postId);
-    formData.append('authorId', authorId);
-    if (file) formData.append('file', file);
-
-    // Важливо: додаємо токен капчі, щоб бекенд міг верифікувати
-    formData.append('captchaToken', captchaValue);
-
     try {
-      const res = await fetch('http://localhost:3000/comments', {
+      const formData = new FormData();
+      formData.append('text', text);
+      formData.append('postId', postId);
+      formData.append('authorId', authorId);
+      if (file) formData.append('file', file);
+      formData.append('captchaToken', captchaValue);
+
+      const res = await fetch('http://localhost:5000/comments', {
         method: 'POST',
         body: formData,
       });
 
+      const data = await res.json();
+
+      if (data.fileUrl) {
+        const imgBBCode = `[img]${data.fileUrl}[/img]`;
+        const fullText = `${text}\n${imgBBCode}`;
+
+        // Show user new text
+        console.log("Full comment text with image:", fullText);
+      }
+
       if (!res.ok) throw new Error('Failed to submit comment');
       alert('Comment submitted!');
 
-      // Скидаємо стани після успішної відправки
       setText('');
       setFile(null);
       setCaptchaValue(null);
-      // Якщо треба, ресетимо капчу
       if (captchaRef.current) captchaRef.current.reset();
 
+      // Update commmnts
+      fetchComments(postId);
     } catch (error) {
       alert(String(error));
+    }
+  };
+
+  // Сабміт відповіді
+  const handleReplySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!replyText.trim()) {
+      alert('Reply cannot be empty');
+      return;
+    }
+
+    if (!replyingTo) {
+      alert('No comment selected for reply');
+      return;
+    }
+
+    try {
+      const res = await fetch('http://localhost:5000/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: replyText,
+          postId,
+          authorId: authorId,
+          parentId: replyingTo
+        }),
+      });
+
+      if (!res.ok) throw new Error('Failed to submit reply');
+      alert('Reply submitted!');
+
+      setReplyText('');
+      setReplyingTo(null);
+
+      fetchComments(postId);
+    } catch (error) {
+      alert(String(error));
+    }
+  };
+
+  // Update comments
+  const fetchComments = async (postId: string) => {
+    try {
+      const res = await fetch(`http://localhost:5000/comments/post/${postId}/comments`);
+      if (!res.ok) throw new Error('Failed to fetch comments');
+      const data = await res.json();
+      setComments(data);
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -80,9 +157,6 @@ export default function App() {
       .replace(/\[code\](.*?)\[\/code\]/g, '<code>$1</code>')
       .replace(/\[a\](.*?)\[\/a\]/g, '<a href="#">$1</a>');
   };
-
-  // Реф для рекапчі, щоб можна було ресетнути
-  const captchaRef = React.useRef<ReCAPTCHA>(null);
 
   return (
     <div style={{ maxWidth: 600, margin: 'auto' }}>
@@ -134,10 +208,9 @@ export default function App() {
           />
         </div>
 
-        {/* Тут вставляємо reCAPTCHA */}
         <div style={{ margin: '20px 0' }}>
           <ReCAPTCHA
-            sitekey={import.meta.env.VITE_CAPTCHA_SITE_KEY} // Передбачає, що ключ лежить в .env
+            sitekey={import.meta.env.VITE_CAPTCHA_SITE_KEY}
             onChange={onCaptchaChange}
             ref={captchaRef}
           />
@@ -165,6 +238,60 @@ export default function App() {
           dangerouslySetInnerHTML={{ __html: renderTextWithTags(text) }}
         />
       )}
+
+      <hr style={{ margin: '20px 0' }} />
+
+      <h2>Comments</h2>
+
+      {comments.length === 0 && <p>No comments yet</p>}
+
+      {comments.map(comment => (
+        <div key={comment.id} style={{ marginBottom: 20, borderBottom: '1px solid #eee', paddingBottom: 10 }}>
+          <p><strong>{comment.author.name}</strong>: {comment.text}</p>
+          {comment.fileUrl && comment.fileType?.startsWith('image/') ? (
+            <img src={comment.fileUrl} alt="Comment image" style={{ maxWidth: '100%', borderRadius: 8 }} />
+          ) : (
+            <a href={comment.fileUrl} target="_blank" rel="noopener noreferrer">
+              {comment.fileUrl || 'Download file'}
+            </a>
+          )}
+
+          <button onClick={() => setReplyingTo(comment.id)}>Reply</button>
+
+          {replyingTo === comment.id && (
+            <form onSubmit={handleReplySubmit} style={{ marginTop: 10 }}>
+              <input
+                type="text"
+                value={replyText}
+                onChange={e => setReplyText(e.target.value)}
+                placeholder="Your reply..."
+                style={{ width: '70%', marginRight: 10 }}
+              />
+              <button type="submit">Send</button>
+              <button
+                type="button"
+                onClick={() => {
+                  setReplyingTo(null);
+                  setReplyText('');
+                }}
+                style={{ marginLeft: 10 }}
+              >
+                Cancel
+              </button>
+            </form>
+          )}
+
+          {comment.replies && comment.replies.length > 0 && (
+            <div style={{ marginLeft: 20, marginTop: 10 }}>
+              {comment.replies.map(child => (
+                <div key={child.id} style={{ marginBottom: 8 }}>
+                  <p><strong>{child.author.name}</strong>: {child.text}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 }

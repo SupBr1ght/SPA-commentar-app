@@ -10,8 +10,9 @@ export type CommentNode = {
     author?: any; // або твій тип юзера
     createdAt?: Date;
     replies: CommentNode[];
-    // Додай інші поля, які тобі потрібні
 };
+
+
 
 @Injectable()
 export class CommentService {
