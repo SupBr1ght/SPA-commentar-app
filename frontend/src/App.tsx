@@ -10,14 +10,14 @@ export default function App() {
   const [showPreview, setShowPreview] = useState(false);
   const [comments, setComments] = useState<CommentNode[]>([]);
 
-  // Відповідь
+
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState('');
 
   const [captchaValue, setCaptchaValue] = useState<string | null>(null);
   const captchaRef = useRef<ReCAPTCHA>(null);
 
-  // Завантаження коментарів при зміні postId
+  // Upload commntars
   useEffect(() => {
     if (!postId) {
       setComments([]);
@@ -74,6 +74,16 @@ export default function App() {
         body: formData,
       });
 
+      const data = await res.json();
+
+      if (data.fileUrl) {
+        const imgBBCode = `[img]${data.fileUrl}[/img]`;
+        const fullText = `${text}\n${imgBBCode}`;
+
+        // Show user new text
+        console.log("Full comment text with image:", fullText);
+      }
+
       if (!res.ok) throw new Error('Failed to submit comment');
       alert('Comment submitted!');
 
@@ -82,7 +92,7 @@ export default function App() {
       setCaptchaValue(null);
       if (captchaRef.current) captchaRef.current.reset();
 
-      // Оновити коментарі після сабміту
+      // Update commmnts
       fetchComments(postId);
     } catch (error) {
       alert(String(error));
@@ -109,9 +119,9 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           text: replyText,
-          postId, 
-          authorId: authorId, 
-          parentId: replyingTo 
+          postId,
+          authorId: authorId,
+          parentId: replyingTo
         }),
       });
 
@@ -127,7 +137,7 @@ export default function App() {
     }
   };
 
-  // Допоміжна функція для оновлення коментарів
+  // Update comments
   const fetchComments = async (postId: string) => {
     try {
       const res = await fetch(`http://localhost:5000/comments/post/${postId}/comments`);
@@ -238,6 +248,13 @@ export default function App() {
       {comments.map(comment => (
         <div key={comment.id} style={{ marginBottom: 20, borderBottom: '1px solid #eee', paddingBottom: 10 }}>
           <p><strong>{comment.author.name}</strong>: {comment.text}</p>
+          {comment.fileUrl && comment.fileType?.startsWith('image/') ? (
+            <img src={comment.fileUrl} alt="Comment image" style={{ maxWidth: '100%', borderRadius: 8 }} />
+          ) : (
+            <a href={comment.fileUrl} target="_blank" rel="noopener noreferrer">
+              {comment.fileUrl || 'Download file'}
+            </a>
+          )}
 
           <button onClick={() => setReplyingTo(comment.id)}>Reply</button>
 
