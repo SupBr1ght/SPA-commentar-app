@@ -52,7 +52,7 @@ export default function App() {
     formData.append('captchaToken', captchaValue);
 
     try {
-      const res = await fetch('http://localhost:3000/comments', {
+      const res = await fetch('http://localhost:5000/comments', {
         method: 'POST',
         body: formData,
       });
