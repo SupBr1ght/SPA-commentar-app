@@ -14,7 +14,6 @@ export default function App() {
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState('');
 
-  const [captchaValue, setCaptchaValue] = useState<string | null>(null);
   const captchaRef = useRef<ReCAPTCHA>(null);
 
   // Upload commntars
