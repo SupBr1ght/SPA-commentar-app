@@ -25,7 +25,7 @@ export default function App() {
     }
     const fetchComments = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/comments/post/${postId}/comments`);
+        const res = await fetch(`http://${process.env.REACT_APP_API_URL}/comments/post/${postId}/comments`);
         if (!res.ok) throw new Error('Failed to fetch comments');
         const data = await res.json();
         setComments(data);
