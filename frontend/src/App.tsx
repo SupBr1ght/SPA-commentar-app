@@ -52,7 +52,7 @@ export default function App() {
 
     try {
       // Get free token after sending
-      const freshToken = null;
+      const freshToken = captchaRef.current?.getValue();;
       captchaRef.current?.reset();
 
       if (!freshToken) {
