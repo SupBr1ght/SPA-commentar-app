@@ -1,54 +1,51 @@
-SPA Commentar App 🧩
-This project is a Single Page Application (SPA) for comments, built with Nest.js for the backend, React for the frontend, and PostgreSQL for the database. It's designed to be easily launched using Docker Compose.
+# SPA Commentar App
 
-🚀 Quick Start
-To get the application up and running quickly, follow these steps.
-***
-⚠️ You need to have Docker and Docker Compose installed on your system.
+## Overview
 
-1. Clone the Repository
-First, clone the project repository to your local machine:
+This is a Single Page Application for comments with a backend API. Both frontend and backend are deployed and accessible online.
 
-Bash
+---
 
-- git clone <repo-url> # Replace <repo-url> with your repository's URL
-- cd SPA-commentar-app
-2. Create Environment Variables
-Create a .env file in the root of the project (next to docker-compose.yml) and add the following environment variables. Remember to replace yourpassword with a strong password.
+## Frontend
 
-Code snippet
+Access the frontend application in your browser here:  
+[https://spa-commentar-app.vercel.app/](https://spa-commentar-app.vercel.app/)
 
-- POSTGRES_USER=postgres
-- POSTGRES_PASSWORD=yourpassword # Change this to a secure password
-- POSTGRES_DB=commentsdb
-3. Launch Containers
-Once the .env file is set up, you can start all services using Docker Compose:
+---
 
-Bash
+## Backend API
 
-docker compose up -d
-This command will build the images (if they don't exist) and start the backend, frontend, and PostgreSQL database in detached mode.
+The backend API is available at:  
+[https://spa-commentar-app.onrender.com/](https://spa-commentar-app.onrender.com/)
 
-4. Verify the Application
-After the containers are up, you can access the application:
+---
 
-Frontend: Open your browser and go to http://localhost:80
+## Usage
 
-Backend API: Access the backend at http://localhost:5000
+- Use the frontend URL to browse and submit comments.
+- The frontend communicates with the backend API to fetch and post comments.
 
-🛑 Stopping and Cleaning Up
-Stopping Services
-To stop all running services without removing their data:
+---
 
-Bash
+## Development
 
-docker compose down
-Cleaning Up
-To remove all Docker resources (containers, images, volumes, and networks) associated with the project, which is useful for a clean slate:
+If you want to run the project locally for development or testing:
 
-Bash
+1. Clone the repository.
 
-docker compose down --volumes --rmi all
-docker system prune -f
-Contributing
-Feel free to fork the repository, open issues, or submit pull requests.
+2. Set environment variables:
+
+   - For frontend:
+     ```
+     VITE_API_URL=https://spa-commentar-app.onrender.com
+     ```
+
+   - For backend:
+     ```
+     CORS_ORIGINS=https://spa-commentar-app.vercel.app,http://localhost:3000
+     ```
+
+3. Run backend server:
+   ```bash
+   npm run start:dev
+
