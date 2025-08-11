@@ -52,7 +52,7 @@ export default function App() {
 
     try {
       // Get free token after sending
-      const freshToken = await captchaRef.current?.executeAsync();
+      const freshToken = null;
       captchaRef.current?.reset();
 
       if (!freshToken) {
@@ -199,7 +199,6 @@ export default function App() {
         <div style={{ margin: '20px 0' }}>
           <ReCAPTCHA
             sitekey={import.meta.env.VITE_CAPTCHA_SITE_KEY}
-            size="invisible" // to launch executeAsync()
             ref={captchaRef}
           />
         </div>
