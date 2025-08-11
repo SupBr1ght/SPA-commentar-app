@@ -25,7 +25,7 @@ export default function App() {
     }
     const fetchComments = async () => {
       try {
-        const res = await fetch(`http://${process.env.REACT_APP_API_URL}/comments/post/${postId}/comments`);
+        const res = await fetch(`http://${process.env.VITE_API_URL}/comments/post/${postId}/comments`);
         if (!res.ok) throw new Error('Failed to fetch comments');
         const data = await res.json();
         setComments(data);
@@ -69,7 +69,7 @@ export default function App() {
       if (file) formData.append('file', file);
       formData.append('captchaToken', captchaValue);
 
-      const res = await fetch('http://localhost:5000/comments', {
+      const res = await fetch(`http://${process.env.VITE_API_URL}/comments`, {
         method: 'POST',
         body: formData,
       });
@@ -114,7 +114,7 @@ export default function App() {
     }
 
     try {
-      const res = await fetch('http://localhost:5000/comments', {
+      const res = await fetch(`http://${process.env.VITE_API_URL}/comments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -140,7 +140,7 @@ export default function App() {
   // Update comments
   const fetchComments = async (postId: string) => {
     try {
-      const res = await fetch(`http://localhost:5000/comments/post/${postId}/comments`);
+      const res = await fetch(`http://${process.env.VITE_API_URL}/comments/post/${postId}/comments`);
       if (!res.ok) throw new Error('Failed to fetch comments');
       const data = await res.json();
       setComments(data);
