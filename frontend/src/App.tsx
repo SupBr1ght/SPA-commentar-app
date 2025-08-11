@@ -42,12 +42,7 @@ export default function App() {
     setText(prev => prev + tagMarkup);
   };
 
-  const onCaptchaChange = (value: string | null) => {
-    console.log("Captcha value:", value);
-    setCaptchaValue(value);
-  };
 
-  // Сабміт основного коментаря
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -56,18 +51,22 @@ export default function App() {
       return;
     }
 
-    if (!captchaValue) {
-      alert('Please complete the CAPTCHA');
-      return;
-    }
-
     try {
+      // Get free token after sending
+      const freshToken = await captchaRef.current?.executeAsync();
+      captchaRef.current?.reset();
+
+      if (!freshToken) {
+        alert('Please complete the CAPTCHA');
+        return;
+      }
+
       const formData = new FormData();
       formData.append('text', text);
       formData.append('postId', postId);
       formData.append('authorId', authorId);
       if (file) formData.append('file', file);
-      formData.append('captchaToken', captchaValue);
+      formData.append('captchaToken', freshToken);
 
       const res = await fetch(`http://${process.env.VITE_API_URL}/comments`, {
         method: 'POST',
@@ -76,30 +75,20 @@ export default function App() {
 
       const data = await res.json();
 
-      if (data.fileUrl) {
-        const imgBBCode = `[img]${data.fileUrl}[/img]`;
-        const fullText = `${text}\n${imgBBCode}`;
+      if (!res.ok) throw new Error(data?.message || 'Failed to submit comment');
 
-        // Show user new text
-        console.log("Full comment text with image:", fullText);
-      }
-
-      if (!res.ok) throw new Error('Failed to submit comment');
       alert('Comment submitted!');
-
       setText('');
       setFile(null);
-      setCaptchaValue(null);
-      if (captchaRef.current) captchaRef.current.reset();
 
-      // Update commmnts
       fetchComments(postId);
     } catch (error) {
       alert(String(error));
     }
   };
 
-  // Сабміт відповіді
+
+ 
   const handleReplySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -211,7 +200,7 @@ export default function App() {
         <div style={{ margin: '20px 0' }}>
           <ReCAPTCHA
             sitekey={import.meta.env.VITE_CAPTCHA_SITE_KEY}
-            onChange={onCaptchaChange}
+            size="invisible" // to launch executeAsync()
             ref={captchaRef}
           />
         </div>
